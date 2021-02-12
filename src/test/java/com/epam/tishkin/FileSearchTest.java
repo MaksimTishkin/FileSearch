@@ -11,24 +11,43 @@ import java.nio.file.Path;
 import java.nio.file.Files;
 
 public class FileSearchTest {
+    private static FileSearch fileSearchMock;
     private static String folder;
-    private static String fileName;
-    private static Path expectedPathForSearchInFolder;
+    private static String validFileName;
+    private static String invalidFileName;
+    private static String expectedAbsolutePathForFile;
 
     @BeforeAll
     static void initAll() {
+        fileSearchMock = Mockito.mock(FileSearch.class);
         folder = "C:\\Module\\";
-        fileName = "saveGift.ser";
-        expectedPathForSearchInFolder = Paths.get("C:\\Module\\saveGift.ser");
+        validFileName = "saveGift.ser";
+        invalidFileName = "Solution.class";
+        expectedAbsolutePathForFile = "C:\\Module\\out\\production\\saveGift.ser";
     }
 
     @Test
     public void testGetSearchByFileName() throws IOException {
-        FileSearch fileSearchMock = Mockito.mock(FileSearch.class);
-        Mockito.when(fileSearchMock.getSearchByFileName(folder, fileName))
-                .thenReturn(expectedPathForSearchInFolder);
-        SearchByFileNameVisitor fileVisitor = new SearchByFileNameVisitor(fileName);
+        Mockito.when(fileSearchMock.getSearchByFileName(folder, validFileName))
+                .thenReturn(Paths.get(validFileName));
+        Path expectedFileForSearchInFolder = fileSearchMock.getSearchByFileName(folder, validFileName);
+        SearchByFileNameVisitor fileVisitor = new SearchByFileNameVisitor(validFileName);
         Files.walkFileTree(Paths.get(folder), fileVisitor);
-        Assertions.assertEquals(expectedPathForSearchInFolder, fileVisitor.getFile());
+        Assertions.assertEquals(expectedFileForSearchInFolder, fileVisitor.getFile().getFileName());
+        Mockito.when(fileSearchMock.getSearchByFileName(folder, invalidFileName))
+                .thenReturn(null);
+        expectedFileForSearchInFolder = fileSearchMock.getSearchByFileName(folder, invalidFileName);
+        fileVisitor = new SearchByFileNameVisitor(invalidFileName);
+        Files.walkFileTree(Paths.get(folder), fileVisitor);
+        Assertions.assertEquals(expectedFileForSearchInFolder, fileVisitor.getFile());
+    }
+
+    @Test
+    public void testGetFullPathFromRootDirectory() throws IOException {
+        Mockito.when(fileSearchMock.getFullPathFromRootDirectory(folder, validFileName))
+                .thenReturn(Paths.get(expectedAbsolutePathForFile));
+        SearchAbsolutePathForFile fileVisitor = new SearchAbsolutePathForFile(validFileName);
+        Files.walkFileTree(Paths.get(folder), fileVisitor);
+        Assertions.assertEquals(Paths.get(expectedAbsolutePathForFile), fileVisitor.getFile().toAbsolutePath());
     }
 }
