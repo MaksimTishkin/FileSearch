@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileSearchTest {
     private static FileSearch fileSearchMock;
@@ -16,6 +18,7 @@ public class FileSearchTest {
     private static String validFileName;
     private static String invalidFileName;
     private static String expectedAbsolutePathForFile;
+    private static List<Path> listOfFilesInDirectory;
 
     @BeforeAll
     static void initAll() {
@@ -24,6 +27,10 @@ public class FileSearchTest {
         validFileName = "saveGift.ser";
         invalidFileName = "Solution.class";
         expectedAbsolutePathForFile = "C:\\Module\\out\\production\\saveGift.ser";
+        listOfFilesInDirectory = new ArrayList<>();
+        listOfFilesInDirectory.add(Paths.get("saveGift.ser"));
+        listOfFilesInDirectory.add(Paths.get("saveBouquet.ser"));
+        listOfFilesInDirectory.add(Paths.get("saveHome.ser"));
     }
 
     @Test
@@ -49,5 +56,14 @@ public class FileSearchTest {
         SearchAbsolutePathForFile fileVisitor = new SearchAbsolutePathForFile(validFileName);
         Files.walkFileTree(Paths.get(folder), fileVisitor);
         Assertions.assertEquals(Paths.get(expectedAbsolutePathForFile), fileVisitor.getFile().toAbsolutePath());
+    }
+
+    @Test
+    public void testSearchFilesInDirectory() throws IOException {
+        Mockito.when(fileSearchMock.showFilesInDirectory(folder))
+                .thenReturn(listOfFilesInDirectory);
+        SearchFilesInDirectory fileVisitor = new SearchFilesInDirectory();
+        Files.walkFileTree(Paths.get(folder), fileVisitor);
+        Assertions.assertEquals(listOfFilesInDirectory, fileVisitor.getListOfFilesInDirectory());
     }
 }

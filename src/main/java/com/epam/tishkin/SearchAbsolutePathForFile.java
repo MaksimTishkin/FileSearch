@@ -2,12 +2,15 @@ package com.epam.tishkin;
 
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-public class SearchAbsolutePathForFile extends SearchWithVisitFile {
+public class SearchAbsolutePathForFile extends SimpleFileVisitor<Path> {
+    private final String fileName;
+    private Path file;
 
     public SearchAbsolutePathForFile(String fileName) {
-        super(fileName);
+        this.fileName = fileName;
     }
 
     @Override
@@ -17,5 +20,9 @@ public class SearchAbsolutePathForFile extends SearchWithVisitFile {
             return FileVisitResult.TERMINATE;
         }
         return FileVisitResult.CONTINUE;
+    }
+
+    public Path getFile() {
+        return file;
     }
 }
