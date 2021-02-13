@@ -3,8 +3,16 @@ package com.epam.tishkin;
 import java.nio.file.Path;
 import java.util.List;
 
-public interface FileSearch {
-    Path getSearchByFileName(String directory, String fileName);
-    Path getFullPathFromRootDirectory(String directory, String fileName);
-    List<Path> showFilesInDirectory(String directory);
+public class FileSearch {
+    Path getSearchByFileName(Path file) {
+        return null;
+    }
+
+    Path getFullPathFromRootDirectory(Path file) {
+        return null;
+    }
+
+    List<Path> showFilesInDirectory(Path file) {
+        return null;
+    }
 }
